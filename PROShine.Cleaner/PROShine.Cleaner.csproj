@@ -57,6 +57,16 @@
     <Compile Include="ElementsRenamer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unity\BinaryReaderExtensions.cs" />
+    <Compile Include="Unity\BinaryWriterExtensions.cs" />
+    <Compile Include="Unity\Metadata\BundleMetadata.cs" />
+    <Compile Include="Unity\Metadata\FileReference.cs" />
+    <Compile Include="Unity\Metadata\ObjectInfo.cs" />
+    <Compile Include="Unity\Metadata\ObjectReference.cs" />
+    <Compile Include="Unity\Metadata\RTTIBaseClassDescriptor.cs" />
+    <Compile Include="Unity\Metadata\RTTIClassHierarchyDescriptor.cs" />
+    <Compile Include="Unity\UnityBundle.cs" />
+    <Compile Include="Unity\Header\BundleHeader.cs" />
     <Compile Include="UnusedMethodsRemover.cs" />
   </ItemGroup>
   <ItemGroup>

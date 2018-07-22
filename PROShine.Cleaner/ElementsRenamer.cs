@@ -1,11 +1,14 @@
 ﻿using Mono.Cecil;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace PROShine.Cleaner
 {
     public class ElementsRenamer
     {
+        public Dictionary<string, string> RenamedClasses { get; } = new Dictionary<string, string>();
+
         private static readonly Regex ObfuscatedName = new Regex("^[A-Z0-9]{11}$");
 
         private readonly AssemblyDefinition assembly;
@@ -50,25 +53,23 @@ namespace PROShine.Cleaner
             classCount += 1;
             string newClassName = "Class" + classCount;
 
-            //if (Regex.IsMatch(type.Name, "^[A-A]"))
-            //{
-            //    Console.WriteLine("Renaming class " + type.Name + " to " + newClassName);
-            //    type.Name = newClassName;
-            //}
+            Console.WriteLine("Renaming class " + type.Name + " to " + newClassName);
+            RenamedClasses.Add(type.Name, newClassName);
+            type.Name = newClassName;
 
             foreach (FieldDefinition field in type.Fields)
             {
-                //RenameField(field);
+                RenameField(field);
             }
 
             foreach (PropertyDefinition property in type.Properties)
             {
-                //RenameProperty(property);
+                RenameProperty(property);
             }
 
             foreach (MethodDefinition method in type.Methods)
             {
-                //RenameMethod(method);
+                RenameMethod(method);
 
                 if (!method.HasParameters) continue;
 
