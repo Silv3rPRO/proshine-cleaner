@@ -64,6 +64,8 @@ namespace PROShine.Cleaner
                     bundle.ContentData = bundle.ContentData.Remove(index, paddedOldClassName.Length).Insert(index, paddedNewClassName);
                     int delta = bundle.ContentData.Length - oldSize;
 
+                    Console.WriteLine($"Replaced {oldClassName} to {newClassName} at index {index}, delta {delta}");
+
                     if (delta != 0)
                     {
                         editedObjectInfo.DataSize += delta;
