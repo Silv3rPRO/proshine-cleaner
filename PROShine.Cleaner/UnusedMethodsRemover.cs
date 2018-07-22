@@ -92,7 +92,7 @@ namespace PROShine.Cleaner
 
             foreach (MethodDefinition method in type.Methods.ToArray())
             {
-                if (method.IsVirtual || method.IsSetter || method.IsGetter ||
+                if (method.GenericParameters.Count > 0 || method.IsSetter || method.IsGetter ||
                     method.IsVirtual || method.IsAbstract || method.HasOverrides ||
                     method.IsCompilerControlled || method.IsConstructor || method.IsPInvokeImpl ||
                     method.IsUnmanaged || method.IsUnmanagedExport) continue;
