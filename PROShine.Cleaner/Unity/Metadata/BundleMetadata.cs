@@ -45,7 +45,8 @@ namespace PROShine.Cleaner.Unity.Metadata
                 Dependencies.Add(dependency);
             }
 
-            Unknown = reader.ReadBytes(11);
+            Unknown = reader.ReadBytes(8);
+            reader.Align4();
         }
 
         public void Serialize(BinaryWriter writer)
@@ -71,6 +72,7 @@ namespace PROShine.Cleaner.Unity.Metadata
             }
 
             writer.Write(Unknown);
+            writer.Align4();
         }
     }
 }
