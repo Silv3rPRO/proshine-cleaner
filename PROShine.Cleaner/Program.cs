@@ -1,7 +1,10 @@
 ﻿using Mono.Cecil;
+using Newtonsoft.Json;
+using PROShine.Cleaner.Mapping;
 using PROShine.Cleaner.Unity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -11,9 +14,11 @@ namespace PROShine.Cleaner
     {
         internal static void Main()
         {
+            var mappingTable = JsonConvert.DeserializeObject<MappingTable>(File.ReadAllText("mappings.json"));
+
             AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly("Assembly-CSharp.dll.original");
             new UnusedMethodsRemover(assembly).Execute();
-            var renamer = new ElementsRenamer(assembly);
+            var renamer = new ElementsRenamer(assembly, mappingTable);
             renamer.Execute();
             assembly.Write("Assembly-CSharp.dll");
 

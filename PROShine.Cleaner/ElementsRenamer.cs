@@ -1,6 +1,8 @@
 ﻿using Mono.Cecil;
+using PROShine.Cleaner.Mapping;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PROShine.Cleaner
@@ -12,6 +14,7 @@ namespace PROShine.Cleaner
         private static readonly Regex ObfuscatedName = new Regex("^[A-Z0-9]{11}$");
 
         private readonly AssemblyDefinition assembly;
+        private readonly MappingTable mappingTable;
 
         private int classCount;
         private int propertyCount;
@@ -19,9 +22,10 @@ namespace PROShine.Cleaner
         private int methodCount;
         private int paramCount;
 
-        public ElementsRenamer(AssemblyDefinition assembly)
+        public ElementsRenamer(AssemblyDefinition assembly, MappingTable mappingTable)
         {
             this.assembly = assembly;
+            this.mappingTable = mappingTable;
         }
 
         public void Execute()
@@ -48,10 +52,17 @@ namespace PROShine.Cleaner
             }
 
             if (!ObfuscatedName.IsMatch(type.Name)) return;
+
             if (type.IsAbstract || type.IsInterface || type.GenericParameters.Count > 0 || !type.IsClass || type.IsEnum) return;
 
             classCount += 1;
             string newClassName = "Class" + classCount;
+
+            var mappedClass = GetMappedClass(type);
+            if (mappedClass != null)
+            {
+                newClassName = mappedClass.Name;
+            }
 
             Console.WriteLine("Renaming class " + type.Name + " to " + newClassName);
             RenamedClasses.Add(type.Name, newClassName);
@@ -79,6 +90,34 @@ namespace PROShine.Cleaner
                     RenameParameter(parameter);
                 }
             }
+        }
+
+        private ClassMapping GetMappedClass(TypeDefinition type)
+        {
+            foreach (var mappedClass in mappingTable.Classes)
+            {
+                if (mappedClass.Attribute != null)
+                {
+                    if (!type.CustomAttributes.Any(
+                        attribute => attribute.AttributeType.Name == mappedClass.Attribute.Name &&
+                        attribute.ConstructorArguments.Any(argument => argument.Value as string == mappedClass.Attribute.Argument)))
+                    {
+                        continue;
+                    }
+                }
+                if (mappedClass.Methods != null)
+                {
+                    if (!mappedClass.Methods.All(
+                        methodEvidence => type.Methods.Any(method =>
+                        (methodEvidence.Name == null || method.Name == methodEvidence.Name) &&
+                        (methodEvidence.ParamType == null || (method.Parameters.Count > 0 && method.Parameters[0].ParameterType.Name == methodEvidence.ParamType)))))
+                    {
+                        continue;
+                    }
+                }
+                return mappedClass;
+            }
+            return null;
         }
 
         private void RenameMethod(MethodDefinition method)
